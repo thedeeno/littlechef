@@ -401,6 +401,7 @@ env.chef_environment = littlechef.chef_environment
 env.loglevel = littlechef.loglevel
 env.verbose = littlechef.verbose
 env.node_work_path = littlechef.node_work_path
+env.follow_symlinks = False
 
 if littlechef.__cooking__:
     # Called from command line
