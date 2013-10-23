@@ -33,6 +33,17 @@ def install(distro_type, distro, gems, version, stop_client):
     with show('running'):
         sudo('curl -L https://www.opscode.com/chef/install.sh | bash')
 
+    if stop_client == 'yes':
+        # We only want chef-solo, stop chef-client and remove it from init
+        sudo('update-rc.d -f chef-client remove')
+        with settings(hide('warnings'), warn_only=True):
+            # The logrotate entry will force restart of chef-client
+            sudo('rm /etc/logrotate.d/chef')
+        with settings(hide('warnings'), warn_only=True):
+            output = sudo('service chef-client stop')
+        if output.failed:
+            # Probably an older distro without the newer "service" command
+            sudo('/etc/init.d/chef-client stop')
 
 def configure(current_node=None):
     """Deploy chef-solo specific files"""
@@ -264,17 +275,6 @@ def _apt_install(distro, version, stop_client='yes'):
                 print(colors.red(
                     "Error while executing 'apt-get install chef':"))
                 abort(output)
-        if stop_client == 'yes':
-            # We only want chef-solo, stop chef-client and remove it from init
-            sudo('update-rc.d -f chef-client remove')
-            with settings(hide('warnings'), warn_only=True):
-                # The logrotate entry will force restart of chef-client
-                sudo('rm /etc/logrotate.d/chef')
-            with settings(hide('warnings'), warn_only=True):
-                output = sudo('service chef-client stop')
-            if output.failed:
-                # Probably an older distro without the newer "service" command
-                sudo('/etc/init.d/chef-client stop')
 
 
 def _add_rpm_repos():
