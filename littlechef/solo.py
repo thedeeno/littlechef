@@ -29,25 +29,9 @@ BASEDIR = os.path.abspath(os.path.dirname(__file__).replace('\\', '/'))
 
 
 def install(distro_type, distro, gems, version, stop_client):
-    """Calls the appropriate installation function for the given distro"""
-    if distro_type == "debian":
-        if gems == "yes":
-            _gem_apt_install()
-        else:
-            _apt_install(distro, version, stop_client)
-    elif distro_type == "rpm":
-        if gems == "yes":
-            _gem_rpm_install()
-        else:
-            _rpm_install()
-    elif distro_type == "gentoo":
-        _emerge_install()
-    elif distro_type == "pacman":
-        _gem_pacman_install()
-    elif distro_type == "freebsd":
-        _gem_ports_install()
-    else:
-        abort('wrong distro type: {0}'.format(distro_type))
+    """Install Chef with omnibus script"""
+    with show('running'):
+        sudo('curl -L https://www.opscode.com/chef/install.sh | bash')
 
 
 def configure(current_node=None):
